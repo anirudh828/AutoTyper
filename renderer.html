@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auto Typer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo-section">
+        <h1>Auto Typer</h1>
+        <p>Automation Tool</p>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button id="settingsBtn" style="background: transparent; border: none; font-size: 20px; cursor: pointer; transition: transform 0.3s ease; color: var(--text-muted); padding: 0; display: flex; align-items: center; justify-content: center; outline: none;" onmouseover="this.style.color='#f3f4f6'; this.style.transform='rotate(45deg)'" onmouseout="this.style.color='#9ca3af'; this.style.transform='rotate(0deg)'">⚙️</button>
+        <div class="status-container">
+          <div id="statusBadge" class="badge status-idle">Idle</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Home Panel -->
+    <main class="panel" id="homePanel">
+      <!-- Countdown overlay -->
+      <div id="countdownOverlay" class="overlay-countdown">
+        <div id="countdownNumber" class="countdown-number">3</div>
+        <div id="countdownTitle" class="countdown-title">Get Ready...</div>
+        <div id="countdownSubtitle" class="countdown-subtitle">Click and focus your target application now! Typing will lock to this window.</div>
+        <div id="countdownTarget" class="countdown-target"></div>
+      </div>
+
+      <!-- Text Entry Section -->
+      <div class="input-section">
+        <label for="textInput">
+          <span>Text to Type</span>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--accent-purple); font-size: 12px; font-weight: 600;">
+              <input type="checkbox" id="clipboardToggle" style="width: 13px; height: 13px; cursor: pointer; accent-color: var(--accent-purple);">
+              <span>Use Clipboard</span>
+            </label>
+            <span id="textCounter" class="label-counter">0 chars / 0 lines</span>
+          </div>
+        </label>
+        <textarea id="textInput" placeholder="Paste or type your text here. Only safe characters will type. Tab and Enter are simulated as standard navigation/newlines."></textarea>
+      </div>
+
+      <!-- Configuration Grid -->
+      <div class="config-grid">
+        <div class="config-card">
+          <div class="card-title">Typing Mode</div>
+          <div class="toggle-group" id="modeToggle">
+            <button class="toggle-btn active" data-value="character">Character</button>
+            <button class="toggle-btn" data-value="line">Line</button>
+          </div>
+        </div>
+
+        <div class="config-card">
+          <div class="card-title">Typing Interval</div>
+          <div class="slider-group">
+            <div class="slider-labels">
+              <span>Delay:</span>
+              <span id="delayVal" class="slider-val">50 ms</span>
+            </div>
+            <input type="range" id="delaySlider" min="30" max="1000" step="5" value="50">
+          </div>
+        </div>
+      </div>
+
+      <!-- Jitter Configuration -->
+      <div class="config-grid">
+        <div class="config-card">
+          <div class="card-title">Natural Variation (Jitter)</div>
+          <div class="slider-group">
+            <div class="slider-labels">
+              <span>Max Jitter:</span>
+              <span id="jitterVal" class="slider-val">10 ms</span>
+            </div>
+            <input type="range" id="jitterSlider" min="0" max="150" step="5" value="10">
+          </div>
+        </div>
+
+        <div class="config-card">
+          <div class="card-title">Countdown Duration</div>
+          <div class="slider-group">
+            <div class="slider-labels">
+              <span>Timer:</span>
+              <span id="countdownVal" class="slider-val">Instant</span>
+            </div>
+            <input type="range" id="countdownSlider" min="0" max="10" step="1" value="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- Safe Lock Active Window Status -->
+      <div id="safetyDisplay" class="safety-display">
+        <span>🛡️ Safe Mode: Locked focus prevents typing in background.</span>
+      </div>
+
+      <div id="targetConfirmBox" class="target-confirm-box">
+        <div class="target-dot"></div>
+        <span id="targetText">Locked to window: <strong>None</strong></span>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="action-buttons">
+        <button id="armBtn" class="btn btn-primary">⚡ Arm & Start</button>
+        <button id="stopBtn" class="btn btn-danger" disabled>🛑 Stop</button>
+      </div>
+
+      <!-- Live Log Console -->
+      <div class="console-section">
+        <label>System Logs</label>
+        <div id="consoleBox" class="console-box">
+          <div class="console-line info">Console initialized. Ready.</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Settings Panel -->
+    <main class="panel" id="settingsPanel" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">
+        <h2 style="font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--text-main);">Settings & Customization</h2>
+        <button id="closeSettingsBtn" style="background: transparent; border: none; color: var(--text-muted); font-size: 26px; cursor: pointer; padding: 0 5px; outline: none; transition: color 0.2s;" onmouseover="this.style.color='#f3f4f6'" onmouseout="this.style.color='#9ca3af'">×</button>
+      </div>
+
+      <!-- Section: Themes -->
+      <div class="config-card" style="background: rgba(0, 0, 0, 0.2); padding: 14px; border-radius: 8px;">
+        <div class="card-title" style="margin-bottom: 10px; font-size: 12px;">Select Theme</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <button class="toggle-btn theme-select-btn" data-theme="default" style="padding: 8px;">Indigo Night</button>
+          <button class="toggle-btn theme-select-btn" data-theme="sunset" style="padding: 8px;">Sunset Crimson</button>
+          <button class="toggle-btn theme-select-btn" data-theme="cyberpunk" style="padding: 8px;">Cyberpunk Gold</button>
+          <button class="toggle-btn theme-select-btn" data-theme="forest" style="padding: 8px;">Forest Green</button>
+        </div>
+      </div>
+
+      <!-- Section: Hotkeys -->
+      <div class="config-card" style="background: rgba(0, 0, 0, 0.2); padding: 14px; border-radius: 8px;">
+        <div class="card-title" style="margin-bottom: 10px; font-size: 12px;">Custom Shortcuts</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div style="display: flex; flex-direction: column;">
+            <span style="font-size: 11px; color: var(--text-muted);">Arm / Start Hotkey</span>
+            <button id="startHotkeyBtn" class="toggle-btn" style="border: 1px solid var(--glass-border); padding: 8px; font-family: var(--font-mono); margin-top: 5px; width: 100%;">F6</button>
+          </div>
+          <div style="display: flex; flex-direction: column;">
+            <span style="font-size: 11px; color: var(--text-muted);">Emergency Stop Hotkey</span>
+            <button id="stopHotkeyBtn" class="toggle-btn" style="border: 1px solid var(--glass-border); padding: 8px; font-family: var(--font-mono); margin-top: 5px; width: 100%;">Ctrl+Alt+S</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Preferences -->
+      <div class="config-card" style="background: rgba(0, 0, 0, 0.2); padding: 14px; border-radius: 8px;">
+        <div class="card-title" style="margin-bottom: 10px; font-size: 12px;">Preferences</div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 13px; font-weight: 500;">
+            <span>Simulate Keyboard Sounds</span>
+            <input type="checkbox" id="soundToggle" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--accent-purple);">
+          </label>
+          <button id="resetDefaultsBtn" class="btn" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--accent-red); padding: 8px; font-size: 12px; font-weight: 600; font-family: var(--font-display); border-radius: 6px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.18)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'">Restore Defaults</button>
+        </div>
+      </div>
+
+      <!-- Section: About -->
+      <div class="config-card" style="background: rgba(0, 0, 0, 0.2); padding: 14px; border-radius: 8px; display: flex; flex-direction: column; gap: 8px;">
+        <div class="card-title" style="font-size: 12px;">About Auto Typer</div>
+        <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; user-select: text;">
+          Auto Typer is a lightweight desktop automation utility. It emulates physical keyboard hardware scan codes at the OS level using the Win32 SendInput API.
+        </p>
+        <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; user-select: text;">
+          Equipped with target window focus checking, customizable shortcuts, and clipboard typing automation.
+        </p>
+        <div style="margin-top: 10px; border-top: 1px solid var(--glass-border); padding-top: 10px; text-align: center; font-size: 12px; color: var(--text-main); font-weight: 600; font-family: var(--font-display);">
+          Made with ❤️ by Anirudh
+        </div>
+      </div>
+    </main>
+
+
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

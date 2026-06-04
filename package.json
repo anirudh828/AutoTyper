@@ -1,0 +1,19 @@
+{
+  "name": "autotyper",
+  "version": "1.0.0",
+  "description": "A safe, user-controlled auto-typing desktop utility for Windows.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [
+    "autotyper",
+    "automation",
+    "safe"
+  ],
+  "author": "Anirudh",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "31.7.7"
+  }
+}
